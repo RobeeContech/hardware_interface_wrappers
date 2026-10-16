@@ -100,7 +100,11 @@ namespace hardware_interface_wrappers
           bool found_state_interface = false;
           for (uint i = 0; i < info_.joints[j].state_interfaces.size(); i++ && !found_state_interface)
           { 
-            if (state_interfaces[k].get_interface_name() == info_.joints[j].state_interfaces[i].name && std::find(include_interface_name.begin(),include_interface_name.end(),state_interfaces[k].get_interface_name()) != include_interface_name.end() )
+            // Velocity feedback uses the same transmission as position, without its offset.
+            // The wrapped driver must provide actuator position units per second.
+            if (state_interfaces[k].get_interface_name() == info_.joints[j].state_interfaces[i].name &&
+                (state_interfaces[k].get_interface_name() == "velocity" ||
+                 std::find(include_interface_name.begin(),include_interface_name.end(),state_interfaces[k].get_interface_name()) != include_interface_name.end()))
             {
               found_state_interface = true;
               HackableHandle t(state_interfaces[k]);
